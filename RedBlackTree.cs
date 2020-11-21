@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RedBlackTree
 {
@@ -343,69 +340,71 @@ namespace RedBlackTree
         /// <summary>
         /// 打印树的完整结构。
         /// </summary>
-        public void Print()
+        public void PrintToConsole()
         {
             if (_root == null) return;
-            List<List<string>> table = new List<List<string>>();
-            Queue<Node> queue1 = new Queue<Node>();
-            Queue<Node> queue2 = new Queue<Node>();
-            queue1.Enqueue(_root);
+            List<List<Node>> table = new List<List<Node>>();
+            table.Add(new List<Node>(1) { _root});
             bool flag = true;
+            List<Node> prev_row = table[0];
             while (flag)
             {
-                List<string> line = new List<string>();
-                Queue<Node> temp = queue1;
-                queue1 = queue2;
-                queue2 = temp;
                 flag = false;
-                while (queue2.Count != 0)
+                List<Node> row = new List<Node>();
+                foreach(Node i in prev_row)
                 {
-                    Node node = queue2.Dequeue();
-                    if (node == null)
+                    if (i == null)
                     {
-                        line.Add("    ");
-                        queue1.Enqueue(null);
-                        queue1.Enqueue(null);
+                        row.Add(null);
+                        row.Add(null);
                     }
                     else
                     {
-                        if(node.isRed)
-                            line.Add($"/\\R/{node.item, -4}");
-                        else
-                            line.Add($"{node.item,-4}");
-                        queue1.Enqueue(node.left);
-                        queue1.Enqueue(node.right);
+                        row.Add(i.left);
+                        row.Add(i.right);
                         flag = true;
                     }
                 }
-                if(flag) table.Add(line);
+                if (flag)
+                {
+                    table.Add(row);
+                    prev_row = row;
+                }
             }
-            int width =  8 << table.Count;
+            int width = 4 << table.Count;
             Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("The structure of the RedBlackBST:");
+            Console.WriteLine("The structure of the RedBlackTree:");
             Console.ResetColor();
-            foreach (var line in table)
+            foreach(var row in table)
             {
-                Console.WriteLine();
                 width >>= 1;
                 string blank = "";
                 for (int j = 0; j < width - 4; j++)
                     blank += " ";
                 for (int j = 0; j < width / 2 - 4; j++)
                     Console.Write(" ");
-                foreach (var cell in line)
+                foreach(Node cell in row)
                 {
-                    if (cell.StartsWith("/\\R/"))
+                    if (cell == null)
                     {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.Write(cell.Substring(4) + blank);
-                        Console.ResetColor();
+                        Console.Write("    " + blank);
                     }
                     else
-                        Console.Write(cell + blank);
+                    {
+                        if (cell.isRed)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.Write($"{cell.item, -4}" + blank);
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+                            Console.Write($"{cell.item, -4}" + blank);
+                        }
+                    }
                 }
+                Console.WriteLine();
             }
-            Console.WriteLine();
         }
 
 
